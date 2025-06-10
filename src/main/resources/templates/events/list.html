@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Event List</title>
+    <meta charset="UTF-8">
+    <style>
+        table {
+            width: 60%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundled/stomp.umd.min.js"></script>
+</head>
+
+<body>
+
+    <h2 style="text-align:center;">List of Events</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Color</th>
+                <th>Event title</th>
+                <th>Description</th>
+                <th>Image</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="event : ${events}">
+                <td th:text="${event.color}">1</td>
+                <td th:text="${event.title}">Sample Event</td>
+                <td th:text="${event.description}">2025-06-01</td>
+                <td>
+                    <img th:src="@{${event.imageFileUrl}}" alt="Event Image" style="width: 100px; height: auto;" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script>
+        // Request browser notification permission
+        function requestPermission() {
+            if (window.Notification) {
+                Notification.requestPermission();
+            }
+        }
+
+        // Ask permission on page load
+        document.addEventListener("DOMContentLoaded", function () {
+            requestPermission();
+        });
+
+        // Connect to WebSocket
+        const socket = new SockJS('/ws');
+        const stompClient = Stomp.over(socket);
+        stompClient.debug = null;
+
+        stompClient.connect({}, function (frame) {
+
+            stompClient.subscribe("/user/queue/notifications", function (notification) {
+
+
+                if (Notification.permission === "granted") {
+                    new Notification("🔔 Reminder", {
+                        body: notification["content"],
+
+                    });
+                } else {
+                    alert("Reminder: " + message); // Fallback
+                }
+            });
+        }); </script>
+
+
+</body>
+
+</html>
