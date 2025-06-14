@@ -1,4 +1,4 @@
-package com.company.event_calendar.event.models;
+package com.company.event_calendar.event.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,10 +15,11 @@ import com.company.event_calendar.config.notification.NotificationType;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reminder {
+public class ReminderEntity {
     @NotNull(message = "Reminder time is required")
     private LocalDateTime reminderTime;
     
     private NotificationType notificationType; // EMAIL, POPUP, etc.
 
-    private boolean sent = false;}
+    private boolean sent = false;
+}

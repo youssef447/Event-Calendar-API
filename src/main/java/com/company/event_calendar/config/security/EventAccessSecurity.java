@@ -7,10 +7,10 @@ import com.company.event_calendar.event.repository.EventRepository;
 
 import lombok.RequiredArgsConstructor;
 
-@Component("eventSecurity")
-@RequiredArgsConstructor
 
-public class EventSecurity {
+@Component("EventSecurity")
+@RequiredArgsConstructor
+public class EventAccessSecurity {
 
     private final EventRepository eventRepository;
 

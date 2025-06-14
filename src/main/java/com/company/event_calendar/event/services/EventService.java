@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.stereotype.Service;
 
 import com.company.event_calendar.config.exceptions.classes.NoEventFoundException;
-import com.company.event_calendar.event.models.Event;
+import com.company.event_calendar.event.entities.EventEntity;
 import com.company.event_calendar.event.repository.EventRepository;
 import com.company.event_calendar.user.entity.UserEntity;
 import com.company.event_calendar.user.service.CurrentUserService;
@@ -25,10 +25,10 @@ public class EventService {
     private final FileStorageService fileStorageService;
 
     @Transactional
-    public Event createEvent(Event event, MultipartFile imageFile) {
+    public EventEntity createEvent(EventEntity event, MultipartFile imageFile) {
         UserEntity currentUser = currentUserService.getCurrentUser();
         event.setUser(currentUser);
-        final Event result = eventRepository.save(event);
+        final EventEntity result = eventRepository.save(event);
         if (imageFile != null && !imageFile.isEmpty()) {
             String fileName = fileStorageService.store(imageFile);
             event.setImageFileUrl(fileName);
@@ -36,26 +36,26 @@ public class EventService {
         return result;
     }
 
-    public List<Event> getAllEvents() {
+    public List<EventEntity> getAllEvents() {
         UserEntity currentUser = currentUserService.getCurrentUser();
         return eventRepository.findByUser(currentUser);
     }
 
-    public Event getEventById(Long id) {
+    public EventEntity getEventById(Long id) {
         return eventRepository.findById(id)
-                .orElseThrow(() -> new NoEventFoundException());
+                .orElseThrow(NoEventFoundException::new);
     }
 
-    public List<Event> getEventsByDateRange(LocalDateTime start, LocalDateTime end) {
+    public List<EventEntity> getEventsByDateRange(LocalDateTime start, LocalDateTime end) {
         UserEntity currentUser = currentUserService.getCurrentUser();
 
-        return eventRepository.findEventsByUserAndDateRange(currentUser, start, end)
-                .orElseThrow(() -> new NoEventFoundException());
+        return eventRepository.findByUserAndDateRange(currentUser, start, end)
+                .orElseThrow(NoEventFoundException::new);
     }
 
     @Transactional
-    public Event updateEvent(Long id, Event eventDetails, MultipartFile imageFile) {
-        Event event = getEventById(id);
+    public EventEntity updateEvent(Long id, EventEntity eventDetails, MultipartFile imageFile) {
+        EventEntity event = getEventById(id);
         event.setTitle(eventDetails.getTitle());
         event.setDescription(eventDetails.getDescription());
         event.setStartTime(eventDetails.getStartTime());
@@ -78,14 +78,15 @@ public class EventService {
     }
 
     @Transactional
-    public void deleteEvent(Long id) {
-        Event event = getEventById(id);
+    public List<EventEntity> deleteEvent(Long id) {
+        EventEntity event = getEventById(id);
 
         eventRepository.delete(event);
         // Delete image if exists
         if (event.getImageFileUrl() != null) {
             fileStorageService.delete(event.getImageFileUrl());
         }
+        return getAllEvents();
     }
 
 }

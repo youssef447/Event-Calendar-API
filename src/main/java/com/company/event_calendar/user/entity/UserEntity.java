@@ -3,18 +3,13 @@ package com.company.event_calendar.user.entity;
 import java.util.Collection;
 import java.util.List;
 
+import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.company.event_calendar.event.models.Event;
+import com.company.event_calendar.event.entities.EventEntity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -40,13 +35,14 @@ public class UserEntity implements UserDetails {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
     private String profileUrl;
+    @Enumerated(EnumType.STRING)
     private UserRole role=UserRole.ROLE_USER;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Event> events;
+    private List<EventEntity> events;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(UserRole.ROLE_USER.name()));
+        return List.of(new SimpleGrantedAuthority(this.getRole().name()));
     }
 }
 

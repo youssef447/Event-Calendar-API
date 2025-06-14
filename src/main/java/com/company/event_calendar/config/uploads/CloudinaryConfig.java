@@ -1,4 +1,4 @@
-package com.company.event_calendar.config.beans;
+package com.company.event_calendar.config.uploads;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;

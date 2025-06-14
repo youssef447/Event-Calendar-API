@@ -11,5 +11,4 @@ public class ApiErrorResponse {
     final LocalDateTime  time;
     final String message;
     final int statusCode;
-    
 }

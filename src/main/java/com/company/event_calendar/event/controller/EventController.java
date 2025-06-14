@@ -3,6 +3,10 @@ package com.company.event_calendar.event.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,8 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.company.event_calendar.config.security.IsEventOwner;
-import com.company.event_calendar.event.models.Event;
-import com.company.event_calendar.event.models.Reminder;
+import com.company.event_calendar.event.entities.EventEntity;
+import com.company.event_calendar.event.entities.ReminderEntity;
 import com.company.event_calendar.event.services.EventService;
 import com.company.event_calendar.event.services.ReminderService;
 
@@ -32,104 +36,111 @@ public class EventController {
     private final EventService eventService;
     private final ReminderService reminderService;
 
+    @Operation(summary = "Get all events", description = "Returns a list of all available events")
     @GetMapping("/getEvents")
+    @ResponseBody
+    public List<EventEntity> getEvents() {
 
-    public String getEvents(Model model) {
-        List<Event> events = eventService.getAllEvents();
-        model.addAttribute("events", events);
-        return "events/list";
-
+        return eventService.getAllEvents();
     }
 
+    @Operation(summary = "Show form to create new event")
     @GetMapping("/new")
     public String showCreateForm(Model model) {
-        model.addAttribute("event", new Event());
+        model.addAttribute("event", new EventEntity());
         return "events/form";
     }
 
+    @Operation(summary = "Create a new event")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Event created successfully"),
+            @ApiResponse(responseCode = "400", description = "Validation error")
+    })
     @PostMapping("/create")
-    public String createEvent(@Valid @ModelAttribute Event event,
-
+    @ResponseBody
+    public EventEntity createEvent(
+            @Valid @ModelAttribute EventEntity event,
+            @Parameter(description = "Optional image file")
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
-
-        Event savedEvent = eventService.createEvent(event, imageFile);
-        return "redirect:/events/" + savedEvent.getId();
+        return eventService.createEvent(event, imageFile);
     }
 
+    @Operation(summary = "Get details of an event by ID")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Event found"),
+            @ApiResponse(responseCode = "404", description = "Event not found")
+    })
     @GetMapping("/{eventId}")
+    @ResponseBody
     @IsEventOwner
-    public String showEventDetails(@PathVariable Long eventId, Model model) {
-        Event event = eventService.getEventById(eventId);
-        List<Reminder> reminders = reminderService.getRemindersByEventId(eventId);
-
-        model.addAttribute("event", event);
-        model.addAttribute("reminders", reminders);
-        model.addAttribute("newReminder", new Reminder());
-
-        return "events/event_details";
+    public EventEntity showEventDetails(@PathVariable Long eventId) {
+        return eventService.getEventById(eventId);
     }
 
+    @Operation(summary = "Show form to edit event")
     @GetMapping("/{eventId}/edit")
     @IsEventOwner
     public String showEditForm(@PathVariable Long eventId, Model model) {
-        Event event = eventService.getEventById(eventId);
+        EventEntity event = eventService.getEventById(eventId);
         model.addAttribute("event", event);
         return "events/edit_form";
     }
 
-    @PostMapping("/{eventId}")
+    @Operation(summary = "Update an existing event")
+    @PostMapping("/{eventId}/update")
+    @ResponseBody
     @IsEventOwner
-    public String updateEvent(@PathVariable Long eventId,
-            @Valid @ModelAttribute Event event,
-
+    public EventEntity updateEvent(
+            @PathVariable Long eventId,
+            @Valid @ModelAttribute EventEntity event,
+            @Parameter(description = "Optional image file")
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
-
-        eventService.updateEvent(eventId, event, imageFile);
-
-        return "redirect:/events/" + eventId;
+        return eventService.updateEvent(eventId, event, imageFile);
     }
 
+    @Operation(summary = "Delete an event by ID")
     @GetMapping("/{eventId}/delete")
+    @ResponseBody
     @IsEventOwner
-    public String deleteEvent(@PathVariable Long eventId) {
-        eventService.deleteEvent(eventId);
-        return "redirect:/events/getEvents";
+    public List<EventEntity> deleteEvent(@PathVariable Long eventId) {
+        return eventService.deleteEvent(eventId);
     }
 
-    // ------------------------------------------------------------------------------
+    @Operation(summary = "Add a reminder to an event")
     @PostMapping("/{eventId}/reminders/add")
+    @ResponseBody
     @IsEventOwner
-    public String addReminder(@PathVariable Long eventId,
-            @ModelAttribute Reminder reminder) {
-        reminderService.addReminderToEvent(eventId, reminder);
-        return "redirect:/events/" + eventId;
+    public EventEntity addReminder(@PathVariable Long eventId, @ModelAttribute ReminderEntity reminder) {
+        return reminderService.addReminderToEvent(eventId, reminder);
     }
 
+    @Operation(summary = "Delete a reminder from an event")
     @GetMapping("/{eventId}/reminders/delete")
+    @ResponseBody
     @IsEventOwner
-    public String deleteReminder(@PathVariable Long eventId,
+    public EventEntity deleteReminder(
+            @PathVariable Long eventId,
+            @Parameter(description = "Reminder time to remove")
             @RequestParam LocalDateTime reminderTime) {
-
-        reminderService.removeReminderFromEvent(eventId, reminderTime);
-        // redirectAttributes.addFlashAttribute("error", "Failed to delete reminder: " +
-        // e.getMessage());
-        return "redirect:/events/" + eventId;
+        return reminderService.removeReminderFromEvent(eventId, reminderTime);
     }
 
+    @Operation(summary = "Add quick predefined reminders to event")
     @PostMapping("/{eventId}/reminders/quick")
+    @ResponseBody
     @IsEventOwner
-    public String addQuickReminders(@PathVariable Long eventId) {
-
-        reminderService.addQuickReminders(eventId);
-
-        return "redirect:/events/" + eventId;
+    public EventEntity addQuickReminders(@PathVariable Long eventId) {
+        return reminderService.addQuickReminders(eventId);
     }
 
+    @Operation(summary = "Get all events in a specific date range (calendar view)")
     @GetMapping("/api")
     @ResponseBody
     @IsEventOwner
-    public List<Event> getEventsForCalendar(
+    public List<EventEntity> getEventsForCalendar(
+            @Parameter(description = "Start datetime")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @Parameter(description = "End datetime")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
         return eventService.getEventsByDateRange(start, end);
     }

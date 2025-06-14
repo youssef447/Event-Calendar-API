@@ -8,6 +8,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,17 +32,16 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll().requestMatchers("/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated())
                 .httpBasic(withDefaults())
-
                 .build();
     }
-
-    
 
     // This bean will be used by Spring Security to handle authentication requests
     @Bean
@@ -56,10 +56,10 @@ public class SecurityConfig {
         /*
          * ProviderManager is Spring Security's default AuthenticationManager
          * implementation.
-         * 
+         *
          * It manages a list of AuthenticationProviders — in this case, just one: the
          * DaoAuthenticationProvider.
-         * 
+         *
          * When authentication is requested, the ProviderManager delegates the request
          * to its providers until one successfully authenticates or all fail. so Spring
          * Security calls the AuthenticationManager.authenticate() method then

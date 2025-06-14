@@ -4,6 +4,7 @@ import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import org.apache.http.HttpStatus;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import com.company.event_calendar.config.exceptions.classes.UserAlreadyExistsExc
 import com.company.event_calendar.config.exceptions.response.ApiErrorResponse;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
+@Hidden
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -47,7 +48,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<?> handleUsernameErrors(UserAlreadyExistsException ex) {
+    public ResponseEntity<?> handleUserAlreadyExistErrors(UserAlreadyExistsException ex) {
         int statusCode = HttpStatus.SC_CONFLICT;
         ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), ex.getMessage(), statusCode);
         return ResponseEntity.status(statusCode).body(response);

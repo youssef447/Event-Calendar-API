@@ -16,7 +16,7 @@
             <form th:action="@{/events/create}" method="post" enctype="multipart/form-data" th:object="${event}">
                 <div class="mb-3">
                     <label for="title" class="form-label">Title</label>
-                    <input type="text" id="title" th:field="*{title}" class="form-control" required />
+                    <input type="text" id="title" th:field="*{title}" class="form-control" required/>
                 </div>
 
                 <div class="mb-3">
@@ -26,32 +26,32 @@
 
                 <div class="mb-3">
                     <label for="startTime" class="form-label">Start Time</label>
-                    <input type="datetime-local" id="startTime" th:field="*{startTime}" class="form-control" required />
+                    <input type="datetime-local" id="startTime" th:field="*{startTime}" class="form-control" required/>
                 </div>
 
                 <div class="mb-3">
                     <label for="endTime" class="form-label">End Time</label>
-                    <input type="datetime-local" id="endTime" th:field="*{endTime}" class="form-control" required />
+                    <input type="datetime-local" id="endTime" th:field="*{endTime}" class="form-control" required/>
                 </div>
 
                 <div class="mb-3">
                     <label for="address" class="form-label">Address</label>
-                    <input type="text" id="address" th:field="*{address}" class="form-control" />
+                    <input type="text" id="address" th:field="*{address}" class="form-control"/>
                 </div>
 
                 <div class="mb-3">
                     <label for="color" class="form-label">Color</label>
-                    <input type="color" id="color" th:field="*{color}" class="form-control form-control-color" />
+                    <input type="color" id="color" th:field="*{color}" class="form-control form-control-color"/>
                 </div>
 
                 <div class="form-check mb-3">
-                    <input type="checkbox" id="allDay" th:field="*{allDay}" class="form-check-input" />
+                    <input type="checkbox" id="allDay" th:field="*{allDay}" class="form-check-input"/>
                     <label for="allDay" class="form-check-label">All Day Event</label>
                 </div>
 
                 <div class="mb-3">
                     <label for="image" class="form-label">Event Image</label>
-                    <input type="file" id="image" name="image" class="form-control" />
+                    <input type="file" id="image" name="image" class="form-control"/>
                 </div>
 
                 <button type="submit" class="btn btn-success">Create Event</button>
