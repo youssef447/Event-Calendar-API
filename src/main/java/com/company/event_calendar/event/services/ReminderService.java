@@ -31,7 +31,7 @@ public class ReminderService {
     private final EmailService emailService;
     private final CurrentUserService currentUserService;
 
-    // private final SMSService smsService;
+
 
     /**
      * Add a reminder to an existing event
@@ -40,7 +40,7 @@ public class ReminderService {
     public EventEntity addReminderToEvent(Long eventId, ReminderEntity reminder) {
 
         EventEntity event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NoEventFoundException());
+                .orElseThrow(NoEventFoundException::new);
 
         // Set default values for the reminder
 
@@ -53,7 +53,7 @@ public class ReminderService {
             throw new IllegalArgumentException("Reminder time already exists for this event");
         }
 
-        // Add reminder to event's collection
+        // Add a reminder to the event's collection
         event.getReminders().add(reminder);
         return event;
 
@@ -65,7 +65,7 @@ public class ReminderService {
     @Transactional
     public EventEntity removeReminderFromEvent(Long eventId, LocalDateTime reminderTime) {
         EventEntity event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NoEventFoundException());
+                .orElseThrow(NoEventFoundException::new);
 
         boolean removed = event.getReminders().removeIf(reminder -> reminder.getReminderTime().equals(reminderTime));
 
@@ -76,15 +76,6 @@ public class ReminderService {
         return event;
     }
 
-    /**
-     * Get all reminders for a specific event
-     */
-    public List<ReminderEntity> getRemindersByEventId(Long eventId) {
-        EventEntity event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NoEventFoundException());
-
-        return event.getReminders();
-    }
 
     /**
      * Add multiple quick reminders to an event (15 min, 1 hour, 1 day before)
@@ -92,11 +83,11 @@ public class ReminderService {
     @Transactional
     public EventEntity addQuickReminders(Long eventId) {
         EventEntity event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NoEventFoundException());
+                .orElseThrow(NoEventFoundException::new);
 
         LocalDateTime eventStart = event.getStartTime();
 
-        // Add 15 minutes before reminder
+        // Add 15 minutes before a reminder
         if (eventStart.minusMinutes(15).isAfter(LocalDateTime.now())) {
             ReminderEntity reminder15 = new ReminderEntity();
             reminder15.setReminderTime(eventStart.minusMinutes(15));
@@ -105,7 +96,7 @@ public class ReminderService {
             event.getReminders().add(reminder15);
         }
 
-        // Add 1 hour before reminder
+        // Add 1 hour before a reminder
         if (eventStart.minusHours(1).isAfter(LocalDateTime.now())) {
             ReminderEntity reminder1h = new ReminderEntity();
             reminder1h.setReminderTime(eventStart.minusHours(1));
@@ -114,7 +105,7 @@ public class ReminderService {
             event.getReminders().add(reminder1h);
         }
 
-        // Add 1 day before reminder
+        // Add 1 day before a reminder
         if (eventStart.minusDays(1).isAfter(LocalDateTime.now())) {
             ReminderEntity reminder1d = new ReminderEntity();
             reminder1d.setReminderTime(eventStart.minusDays(1));
@@ -147,7 +138,7 @@ public class ReminderService {
     }
 
     /**
-     * Send notification for a specific reminder to current user
+     * Send notification for a specific reminder to the current user
      */
     private void sendReminderNotification(EventEntity event, ReminderEntity reminder) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' HH:mm");
@@ -165,7 +156,7 @@ public class ReminderService {
         switch (reminder.getNotificationType()) {
             case EMAIL:
                 emailService.sendEmail(event.getUser().getUsername(), event.getTitle(), message);
-                ;
+
             case POPUP:
                 notificationService.sendNotification(event.getUser().getUsername(), message,
                         reminder.getNotificationType());
@@ -181,7 +172,7 @@ public class ReminderService {
      */
     public long getPendingReminderCount(Long eventId) {
         EventEntity event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new NoEventFoundException());
+                .orElseThrow(NoEventFoundException::new);
 
         return event.getReminders().stream()
                 .filter(reminder -> !reminder.isSent())

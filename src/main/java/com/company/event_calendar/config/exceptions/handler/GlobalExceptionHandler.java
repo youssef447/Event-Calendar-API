@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.company.event_calendar.config.exceptions.classes.NoEventFoundException;
 import com.company.event_calendar.config.exceptions.classes.NoReminderFoundException;
 import com.company.event_calendar.config.exceptions.classes.UserAlreadyExistsException;
-import com.company.event_calendar.config.exceptions.response.ApiErrorResponse;
+import com.company.event_calendar.config.exceptions.response.ApiResponse;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 @Hidden
@@ -29,49 +29,49 @@ public class GlobalExceptionHandler {
         String errorMessages = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
-        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), errorMessages, statusCode);
+        ApiResponse response = new ApiResponse(errorMessages, "error");
         return ResponseEntity.status(statusCode).body(response);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<?> handleDataIntegrityErrors(DataIntegrityViolationException ex) {
         int statusCode = HttpStatus.SC_BAD_REQUEST;
-        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), ex.getMessage(), statusCode);
+        ApiResponse response = new ApiResponse(ex.getMessage(), "error");
         return ResponseEntity.status(statusCode).body(response);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<?> handleUsernameErrors(UsernameNotFoundException ex) {
         int statusCode = HttpStatus.SC_NOT_FOUND;
-        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), ex.getMessage(), statusCode);
+        ApiResponse response = new ApiResponse(ex.getMessage(), "error");
         return ResponseEntity.status(statusCode).body(response);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<?> handleUserAlreadyExistErrors(UserAlreadyExistsException ex) {
         int statusCode = HttpStatus.SC_CONFLICT;
-        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), ex.getMessage(), statusCode);
+        ApiResponse response = new ApiResponse(ex.getMessage(), "error");
         return ResponseEntity.status(statusCode).body(response);
     }
 
     @ExceptionHandler(NoEventFoundException.class)
     public ResponseEntity<?> handleNoEventErrors(NoEventFoundException ex) {
         int statusCode = HttpStatus.SC_NOT_FOUND;
-        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), ex.getMessage(), statusCode);
+        ApiResponse response = new ApiResponse(ex.getMessage(), "error");
         return ResponseEntity.status(statusCode).body(response);
     }
 
     @ExceptionHandler(NoReminderFoundException.class)
     public ResponseEntity<?> handleNoReminderErrors(NoReminderFoundException ex) {
         int statusCode = HttpStatus.SC_NOT_FOUND;
-        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), ex.getMessage(), statusCode);
+        ApiResponse response = new ApiResponse(ex.getMessage(), "error");
         return ResponseEntity.status(statusCode).body(response);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<?> handleIllegalArgumentErrors(IllegalArgumentException ex) {
         int statusCode = HttpStatus.SC_BAD_REQUEST;
-        ApiErrorResponse response = new ApiErrorResponse(LocalDateTime.now(), ex.getMessage(), statusCode);
+        ApiResponse response = new ApiResponse(ex.getMessage(), "error");
         return ResponseEntity.status(statusCode).body(response);
     }
 

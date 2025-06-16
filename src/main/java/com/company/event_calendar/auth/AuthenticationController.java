@@ -1,5 +1,6 @@
 package com.company.event_calendar.auth;
 
+import com.company.event_calendar.user.dto.UserRegistrationDto;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -21,20 +22,20 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 public class AuthenticationController {
 
-  private final AuthenticationService service;
-  private final PasswordEncoder passwordEncoder;
+    private final AuthenticationService service;
+    private final PasswordEncoder passwordEncoder;
 
-  @PostMapping("/register")
-  public ResponseEntity<?> register(
-      @Valid @ModelAttribute UserEntity request,
-      @RequestParam(value = "image", required = false) MultipartFile imageFile) {
-    UserEntity user = new UserEntity();
-    user.setUsername(request.getUsername());
-    user.setPassword(passwordEncoder.encode(request.getPassword()));
-    user.setRole(request.getRole());
-    service.register(user, imageFile);
-    return ResponseEntity.ok(ObjectUtils.asMap("message", "User registered successfully"));
+    @PostMapping("/register")
+    public ResponseEntity<?> register(
+            @Valid @ModelAttribute UserRegistrationDto request,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile) {
+        UserRegistrationDto user = new UserRegistrationDto();
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(request.getRole());
+        service.register(user, imageFile);
+        return ResponseEntity.ok(ObjectUtils.asMap("message",""));
 
-  }
+    }
 
 }
