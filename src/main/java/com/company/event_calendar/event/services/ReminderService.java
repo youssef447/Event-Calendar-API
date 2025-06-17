@@ -44,10 +44,13 @@ public class ReminderService {
         // Set default values for the reminder
 
         // Validate reminder time is before event start time
+        if (reminder.getReminderTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Reminder time cannot be in the past");
+        } // Validate reminder time is before event start time
         if (reminder.getReminderTime().isAfter(event.getStartTime())) {
             throw new IllegalArgumentException("Reminder time must be before event start time");
         }
-        // Validate reminder time is not
+        // Validate reminder time is not already set
         if (event.getReminders().stream().anyMatch(r -> r.getReminderTime().equals(reminder.getReminderTime()))) {
             throw new IllegalArgumentException("Reminder time already exists for this event");
         }
