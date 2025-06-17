@@ -1,19 +1,13 @@
 package com.company.event_calendar.auth;
 
+import com.company.event_calendar.config.response.ApiResponseBody;
+import com.company.event_calendar.user.dto.UserLoginDto;
 import com.company.event_calendar.user.dto.UserRegistrationDto;
+import com.company.event_calendar.user.dto.UserResponseDto;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.cloudinary.utils.ObjectUtils;
-import com.company.event_calendar.user.entity.UserEntity;
 
 import jakarta.validation.Valid;
 
@@ -23,19 +17,23 @@ import jakarta.validation.Valid;
 public class AuthenticationController {
 
     private final AuthenticationService service;
-    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(
+    public ApiResponseBody register(
             @Valid @ModelAttribute UserRegistrationDto request,
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
-        UserRegistrationDto user = new UserRegistrationDto();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole());
-        service.register(user, imageFile);
-        return ResponseEntity.ok(ObjectUtils.asMap("message",""));
 
+        UserResponseDto result = service.register(request, imageFile);
+
+        return new ApiResponseBody("User registered successfully", result, true);
+
+    }
+
+    @PostMapping("/login")
+    public ApiResponseBody login(@Valid @RequestBody UserLoginDto request) {
+        UserResponseDto result = service.login(request);
+
+        return new ApiResponseBody("Login successful", result, true);
     }
 
 }

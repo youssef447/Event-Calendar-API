@@ -32,7 +32,6 @@ public class ReminderService {
     private final CurrentUserService currentUserService;
 
 
-
     /**
      * Add a reminder to an existing event
      */
@@ -63,7 +62,7 @@ public class ReminderService {
      * Remove a reminder from an event by reminder time
      */
     @Transactional
-    public EventEntity removeReminderFromEvent(Long eventId, LocalDateTime reminderTime) {
+    public void removeReminderFromEvent(Long eventId, LocalDateTime reminderTime) {
         EventEntity event = eventRepository.findById(eventId)
                 .orElseThrow(NoEventFoundException::new);
 
@@ -73,7 +72,7 @@ public class ReminderService {
             throw new NoReminderFoundException();
         }
 
-        return event;
+
     }
 
 
@@ -167,16 +166,29 @@ public class ReminderService {
 
     }
 
-    /**
-     * Get count of pending reminders for an event
-     */
-    public long getPendingReminderCount(Long eventId) {
+
+    public long getPendingRemindersCount(Long eventId) {
         EventEntity event = eventRepository.findById(eventId)
                 .orElseThrow(NoEventFoundException::new);
 
         return event.getReminders().stream()
                 .filter(reminder -> !reminder.isSent())
                 .count();
+    }
+
+    public long getTotalPendingRemindersCount() {
+        UserEntity currentUser = currentUserService.getCurrentUser();
+
+        List<EventEntity> events = eventRepository.findByUser(currentUser);
+        long total = 0L;
+        for (var event : events) {
+            total += event.getReminders().stream()
+                    .filter(reminder -> !reminder.isSent())
+                    .count();
+
+        }
+
+        return total;
     }
 
     /**

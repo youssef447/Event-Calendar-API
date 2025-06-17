@@ -1,29 +1,28 @@
 package com.company.event_calendar.event.entities;
 
+import com.company.event_calendar.config.bases.BaseEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import com.company.event_calendar.user.entity.UserEntity;
+import org.springframework.data.annotation.CreatedBy;
+//import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "events")
-@Data
+//@EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EventEntity {
+public class EventEntity extends BaseEntity<Long>{
 
-    @Id
-    @SequenceGenerator(name = "event_seq", sequenceName = "db_scheme_event_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "event_seq")
-    private Long id;
 
     @NotBlank(message = "Title is required")
     private String title;
@@ -63,5 +62,6 @@ public class EventEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
+    @CreatedBy
     private UserEntity user;
 }

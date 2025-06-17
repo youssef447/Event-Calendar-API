@@ -3,6 +3,7 @@ package com.company.event_calendar.event.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.company.event_calendar.config.response.ApiResponseBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -40,7 +41,6 @@ public class EventController {
     @GetMapping("/getEvents")
     @ResponseBody
     public List<EventEntity> getEvents() {
-
         return eventService.getAllEvents();
     }
 
@@ -58,11 +58,12 @@ public class EventController {
     })
     @PostMapping("/create")
     @ResponseBody
-    public EventEntity createEvent(
+    ApiResponseBody createEvent(
             @Valid @ModelAttribute EventEntity event,
             @Parameter(description = "Optional image file")
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
-        return eventService.createEvent(event, imageFile);
+        EventEntity res = eventService.createEvent(event, imageFile);
+        return new ApiResponseBody("event created successfully", res, true);
     }
 
     @Operation(summary = "Get details of an event by ID")
@@ -90,19 +91,21 @@ public class EventController {
     @PostMapping("/{eventId}/update")
     @ResponseBody
     @IsEventOwner
-    public EventEntity updateEvent(
+    public ApiResponseBody updateEvent(
             @PathVariable Long eventId,
             @Valid @ModelAttribute EventEntity event,
             @Parameter(description = "Optional image file")
             @RequestParam(value = "image", required = false) MultipartFile imageFile) {
-        return eventService.updateEvent(eventId, event, imageFile);
+        EventEntity result = eventService.updateEvent(eventId, event, imageFile);
+        return new ApiResponseBody("event updated successfully", result, true);
+
     }
 
     @Operation(summary = "Delete an event by ID")
     @GetMapping("/{eventId}/delete")
     @ResponseBody
     @IsEventOwner
-    public List<EventEntity> deleteEvent(@PathVariable Long eventId) {
+    public ApiResponseBody deleteEvent(@PathVariable Long eventId) {
         return eventService.deleteEvent(eventId);
     }
 
@@ -110,38 +113,63 @@ public class EventController {
     @PostMapping("/{eventId}/reminders/add")
     @ResponseBody
     @IsEventOwner
-    public EventEntity addReminder(@PathVariable Long eventId, @ModelAttribute ReminderEntity reminder) {
-        return reminderService.addReminderToEvent(eventId, reminder);
+    public ApiResponseBody addReminder(@PathVariable Long eventId, @ModelAttribute ReminderEntity reminder) {
+        EventEntity result = reminderService.addReminderToEvent(eventId, reminder);
+        return new ApiResponseBody("reminder added successfully", result, true);
+
+    }
+
+    @Operation(summary = "Get count of pending reminders for an event")
+    @GetMapping("/{eventId}/reminders/count")
+    @ResponseBody
+    @IsEventOwner
+    public ApiResponseBody getPendingRemindersCount(@PathVariable Long eventId) {
+        long result = reminderService.getPendingRemindersCount(eventId);
+        return new ApiResponseBody("pending reminders fetched successfully", result, true);
+
+    }@Operation(summary = "Get Total count of pending reminders for all event")
+    @GetMapping("/reminders/totalCount")
+    @ResponseBody
+    public ApiResponseBody getTotalPendingRemindersCount() {
+        long result = reminderService.getTotalPendingRemindersCount();
+        return new ApiResponseBody("pending reminders fetched successfully", result, true);
+
     }
 
     @Operation(summary = "Delete a reminder from an event")
     @GetMapping("/{eventId}/reminders/delete")
     @ResponseBody
     @IsEventOwner
-    public EventEntity deleteReminder(
+    public ApiResponseBody deleteReminder(
             @PathVariable Long eventId,
             @Parameter(description = "Reminder time to remove")
             @RequestParam LocalDateTime reminderTime) {
-        return reminderService.removeReminderFromEvent(eventId, reminderTime);
+        reminderService.removeReminderFromEvent(eventId, reminderTime);
+        return new ApiResponseBody("reminder deleted successfully", true);
+
     }
 
     @Operation(summary = "Add quick predefined reminders to event")
     @PostMapping("/{eventId}/reminders/quick")
     @ResponseBody
     @IsEventOwner
-    public EventEntity addQuickReminders(@PathVariable Long eventId) {
-        return reminderService.addQuickReminders(eventId);
+    public ApiResponseBody addQuickReminders(@PathVariable Long eventId) {
+        EventEntity result = reminderService.addQuickReminders(eventId);
+        return new ApiResponseBody("reminder added successfully", result, true);
+
     }
 
     @Operation(summary = "Get all events in a specific date range (calendar view)")
-    @GetMapping("/api")
+    @GetMapping("/dateRange")
     @ResponseBody
     @IsEventOwner
-    public List<EventEntity> getEventsForCalendar(
+    public ApiResponseBody getEventsForCalendar(
             @Parameter(description = "Start datetime")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @Parameter(description = "End datetime")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
-        return eventService.getEventsByDateRange(start, end);
+        List<EventEntity> result = eventService.getEventsByDateRange(start, end);
+        return new ApiResponseBody("events fetched successfully", result, true);
+
     }
 }

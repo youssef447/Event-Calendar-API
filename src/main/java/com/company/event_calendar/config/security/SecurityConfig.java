@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**").permitAll().requestMatchers("/v3/api-docs/**",
+                       .requestMatchers("/auth/**","/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated())
@@ -57,10 +57,10 @@ public class SecurityConfig {
          * ProviderManager is Spring Security's default AuthenticationManager
          * implementation.
          *
-         * It manages a list of AuthenticationProviders — in this case, just one: the
+         * it manages a list of AuthenticationProviders — in this case, just one: the
          * DaoAuthenticationProvider.
          *
-         * When authentication is requested, the ProviderManager delegates the request
+         * when authentication is requested, the ProviderManager delegates the request
          * to its providers until one successfully authenticates or all fail. so Spring
          * Security calls the AuthenticationManager.authenticate() method then
          * The ProviderManager passes the authentication request to the

@@ -1,9 +1,11 @@
 package com.company.event_calendar.user.dto;
 
 import com.company.event_calendar.user.entity.UserRole;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class UserResponseDto {
     private String username;
     private String profileUrl;

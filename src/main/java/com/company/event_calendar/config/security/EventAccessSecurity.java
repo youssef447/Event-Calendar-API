@@ -7,13 +7,10 @@ import com.company.event_calendar.event.repository.EventRepository;
 
 import lombok.RequiredArgsConstructor;
 
-
-@Component("EventSecurity")
+@Component("eventAccessSecurity")
 @RequiredArgsConstructor
 public class EventAccessSecurity {
-
     private final EventRepository eventRepository;
-
     public boolean isOwner(Long eventId) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         return eventRepository.findById(eventId)

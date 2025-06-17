@@ -28,4 +28,6 @@ public class CurrentUserService {
         return UserEntityRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User '" + username + "' not found"));
     }
+
+
 }

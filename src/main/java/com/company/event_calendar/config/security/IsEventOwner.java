@@ -9,6 +9,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("@EventSecurity.isOwner(#eventId)")
+@PreAuthorize("@eventAccessSecurity.isOwner(#eventId)")
 public @interface IsEventOwner {
 }

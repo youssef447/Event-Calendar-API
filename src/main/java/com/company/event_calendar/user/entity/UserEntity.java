@@ -1,9 +1,9 @@
 package com.company.event_calendar.user.entity;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+import com.company.event_calendar.config.bases.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,11 +16,8 @@ import com.company.event_calendar.event.entities.EventEntity;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserEntity implements UserDetails {
+public class UserEntity extends BaseEntity<Long> implements UserDetails {
 
-    @Id
-    @GeneratedValue
-    private Long id;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -33,11 +30,11 @@ public class UserEntity implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventEntity> events;
-    private LocalDateTime createdAt;
-    @PrePersist
+   // private LocalDateTime createdAt;
+   /* @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-    }
+    }*/
 
     // Spring Security requirements
     @Override

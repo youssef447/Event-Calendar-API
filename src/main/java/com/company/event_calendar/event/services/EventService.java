@@ -3,6 +3,7 @@ package com.company.event_calendar.event.services;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.company.event_calendar.config.response.ApiResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.stereotype.Service;
 
@@ -26,14 +27,13 @@ public class EventService {
 
     @Transactional
     public EventEntity createEvent(EventEntity event, MultipartFile imageFile) {
-        UserEntity currentUser = currentUserService.getCurrentUser();
-        event.setUser(currentUser);
-        final EventEntity result = eventRepository.save(event);
+
+        eventRepository.save(event);
         if (imageFile != null && !imageFile.isEmpty()) {
             String fileName = fileStorageService.store(imageFile);
             event.setImageFileUrl(fileName);
         }
-        return result;
+        return event;
     }
 
     public List<EventEntity> getAllEvents() {
@@ -73,12 +73,13 @@ public class EventService {
             String fileName = fileStorageService.store(imageFile);
             event.setImageFileUrl(fileName);
         }
-
         return event;
+
+
     }
 
     @Transactional
-    public List<EventEntity> deleteEvent(Long id) {
+    public ApiResponseBody deleteEvent(Long id) {
         EventEntity event = getEventById(id);
 
         eventRepository.delete(event);
@@ -86,7 +87,8 @@ public class EventService {
         if (event.getImageFileUrl() != null) {
             fileStorageService.delete(event.getImageFileUrl());
         }
-        return getAllEvents();
+        return new ApiResponseBody("event deleted successfully", getAllEvents(), true);
+
     }
 
 }
