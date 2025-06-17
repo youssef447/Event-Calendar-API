@@ -1,5 +1,8 @@
 # Documentation
-![Screenshot (473)](https://github.com/user-attachments/assets/6e7ffb35-4b4a-47aa-8e69-41fe5c18b6eb)
+
+![doc](https://github.com/user-attachments/assets/bf909c61-aa95-4fa4-8f43-78cfc49497a6)
+
 
 # ERD
-![myprojects@localhost](https://github.com/user-attachments/assets/6617e68b-3fc2-462e-a25a-a517a4095490)
+
+![erd](https://github.com/user-attachments/assets/7eae0e7f-dae0-488c-b1bf-f1cd11a16fa7)
